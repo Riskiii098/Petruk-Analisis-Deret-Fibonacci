@@ -1,0 +1,71 @@
+#include <iostream>
+#include <chrono>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+using namespace std::chrono;
+
+// Fungsi Fibonacci dengan pendekatan rekursif
+long long fibonacci_recursive(int n) {
+    if (n <= 0) return 0;
+    if (n == 1) return 1;
+    return fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2);
+}
+
+// Fungsi Fibonacci dengan pendekatan dynamic programming
+long long fibonacci_dynamic(int n) {
+    if (n <= 0) return 0;
+    if (n == 1) return 1;
+    vector<long long> fib(n + 1);
+    fib[0] = 0;
+    fib[1] = 1;
+    for (int i = 2; i <= n; ++i) {
+        fib[i] = fib[i - 1] + fib[i - 2];
+    }
+    return fib[n];
+}
+
+// Fungsi untuk mengukur waktu eksekusi
+long long measure_execution_time(long long(*func)(int), int n) {
+    auto start = high_resolution_clock::now();
+    long long result = func(n);
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(end - start).count();
+    return duration;
+}
+
+int main() {
+    // Daftar nilai n yang akan diuji
+    vector<int> n_values = {10, 25, 30, 40, 50};
+    vector<long long> recursive_times;
+    vector<long long> dynamic_times;
+
+    // Pengukuran waktu eksekusi untuk pendekatan rekursif
+    for (int n : n_values) {
+        long long exec_time = measure_execution_time(fibonacci_recursive, n);
+        recursive_times.push_back(exec_time);
+    }
+
+    // Pengukuran waktu eksekusi untuk pendekatan dynamic programming
+    for (int n : n_values) {
+        long long exec_time = measure_execution_time(fibonacci_dynamic, n);
+        dynamic_times.push_back(exec_time);
+    }
+
+    // Output tabel waktu eksekusi
+    cout << left << setw(10) << "n" << setw(20) << "Recursive Time (us)" << "Dynamic Time (us)" << endl;
+    for (size_t i = 0; i < n_values.size(); ++i) {
+        cout << left << setw(10) << n_values[i] << setw(20) << recursive_times[i] << dynamic_times[i] << endl;
+    }
+
+    // Analisis hasil
+    cout << "\nAnalisis Hasil:\n";
+    cout << "Pendekatan rekursif memiliki kompleksitas waktu eksponensial (O(2^n)). "
+         << "Hal ini disebabkan oleh banyaknya pemanggilan fungsi rekursif yang berulang-ulang untuk nilai n yang besar.\n";
+    cout << "Pendekatan dynamic programming memiliki kompleksitas waktu linier (O(n)). "
+         << "Dalam pendekatan ini, kita menyimpan hasil perhitungan sebelumnya sehingga tidak perlu menghitung ulang nilai Fibonacci yang sama.\n";
+    cout << "Oleh karena itu, waktu eksekusi dynamic programming jauh lebih efisien dibandingkan dengan pendekatan rekursif.\n";
+
+    return 0;
+}
